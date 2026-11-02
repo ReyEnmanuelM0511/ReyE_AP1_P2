@@ -1,0 +1,11 @@
+﻿################################################################################
+# Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
+################################################################################
+
+/ReyE_AP1_P2/.vs/ReyE_AP1_P2.slnx
+/ReyE_AP1_P2/obj
+/ReyE_AP1_P2/Properties
+/ReyE_AP1_P2/wwwroot
+/ReyE_AP1_P2/appsettings.Development.json
+/ReyE_AP1_P2/appsettings.json
+/ReyE_AP1_P2/ReyE_AP1_P2.csproj.user
