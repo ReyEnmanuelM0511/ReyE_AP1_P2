@@ -42,7 +42,7 @@
                 <div class="border border-success p-3 mt-3">
                     <h5>Detalles de la Venta</h5>
 
-                    <Picker Productos="ListaProductos"
+                    <Picker Productos="productos"
                                      ProductoId="DetalleSeleccionado.ProductoId"
                                      Cantidad="DetalleSeleccionado.Cantidad"
                                      OnProductoSelected="HandleProductoSelected" />
@@ -91,7 +91,7 @@
 
             @* footer *@
             <div class="card-footer text-center mt-2">
-                <a href="/Ventas/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <a href="/VentasDetallePages/ventasIndex" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
                 <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
             </div>
         </div>
