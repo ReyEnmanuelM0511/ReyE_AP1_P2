@@ -1,20 +1,28 @@
-@using ReyE_AP1_P2.Models
-
-<div class="col-auto input-group align-items-center">
+﻿<div class="col-auto input-group align-items-center">
     <label class="col-form-label input-group-text">Seleccione:</label>
 
-    <InputSelect class="form-control form-select" @bind-Value="ModeloId">
-        <option disabled value="0">-- Seleccione un libro --</option>
-        @foreach (var libro in Libros)
+    <InputSelect class="form-control form-select" @bind-Value="ProductoId" @bind-Value:after="ActualizarPrecio">
+        <option disabled value="0">-- Seleccione un producto --</option>
+        @foreach (var producto in Productos)
         {
-            <option value="@libro.id">@libro.id - @libro.id (Disponibles: @libro)</option>
+            <option value="@producto.ProductoId">
+                @producto.ProductoId - @producto.NombreProducto (Disponibles: @producto.Stock)
+            </option>
         }
     </InputSelect>
+
+    <label class="col-form-label input-group-text">Precio:</label>
+    <label class="form-control">$@Precio.ToString("N2")</label>
+
     <label class="col-form-label input-group-text">Cantidad:</label>
     <InputNumber class="form-control" id="quantity-input" @bind-Value="Cantidad" min="1" />
 
-    <button type="button" class="btn btn-outline-success bi bi-plus" @onclick="TriggerSelection">Agregar</button>
+    <button type="button" class="btn btn-outline-success bi bi-plus"
+            @onclick="TriggerSelection">
+        Agregar
+    </button>
 </div>
+
 @if (ErrorMessage != null)
 {
     <div class="alert alert-danger mt-2" role="alert">
@@ -24,37 +32,57 @@
 
 @code {
     [Parameter]
-    public List<Modelo> Libros { get; set; } = [];
+    public List<Productos> Productos { get; set; } = [];
 
     [Parameter]
-    public int ModeloId { get; set; }
+    public int ProductoId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ProductoIdChanged { get; set; }
 
     [Parameter]
     public int Cantidad { get; set; } = 1;
 
+    private double Precio { get; set; } = 0;
+
     [Parameter]
-    public EventCallback<(Modelo Modelo, int Cantidad)> OnLibroSelected { get; set; }
+    public EventCallback<int> CantidadChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<(Productos Producto, int Cantidad)> OnProductoSelected { get; set; }
 
     private string? ErrorMessage { get; set; } = null;
 
     private async Task TriggerSelection()
     {
         ErrorMessage = null;
-        if (ModeloId > 0 && Cantidad > 0)
+        if (ProductoId > 0 && Cantidad > 0)
         {
-            var libroSeleccionado = Libros.SingleOrDefault(l => l.id == ModeloId);
+            var productoSeleccionado = Productos.SingleOrDefault(p => p.ProductoId == ProductoId);
 
-            if (libroSeleccionado == null)
+            if (productoSeleccionado == null)
             {
-                ErrorMessage = "El libro seleccionado no es válido";
+                ErrorMessage = "El producto seleccionado no es válido";
                 return;
             }
 
-            await OnLibroSelected.InvokeAsync((Modelo modelo, Cantidad));
+            await OnProductoSelected.InvokeAsync((productoSeleccionado, Cantidad));
+
+            ProductoId = 0;
+            await ProductoIdChanged.InvokeAsync(ProductoId);
+            Precio = 0;
+            Cantidad = 1;
+            await CantidadChanged.InvokeAsync(Cantidad);
         }
         else
         {
-            ErrorMessage = "Debe seleccionar un libro y colocar una cantidad válida";
+            ErrorMessage = "Debe seleccionar un producto y colocar una cantidad válida";
         }
+    }
+
+    private void ActualizarPrecio()
+    {
+        var productoSeleccionado = Productos.SingleOrDefault(p => p.ProductoId == ProductoId);
+        Precio = productoSeleccionado?.Precio ?? 0;
     }
 }

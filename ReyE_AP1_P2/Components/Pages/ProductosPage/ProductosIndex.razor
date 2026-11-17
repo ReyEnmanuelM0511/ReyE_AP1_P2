@@ -1,0 +1,128 @@
+﻿@page "/productosIndex"
+
+@rendermode InteractiveServer
+@inject ProductosServices ProductoServices
+
+
+<PageTitle>Base de Datos de Productos</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header d-flex justify-content-between align-items-center mb-4">
+            <h3 class="card-title">Listado de Productos</h3>
+            <a href="/crearLibro" class="btn btn-primary"><span class="bi bi-plus-square mt-3"></span>Agregar Libro</a>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row align-items-end mb-4">
+
+                <div class="col-md-3">
+                    <label class="form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Búsqueda</strong></label>
+                </div>
+
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="">Elija una opción</option>
+                        <option value="ProductoId">ProductoId</option>
+                        <option value="NombreProducto">Nombre del Producto</option>
+                        <option value="Tipo">Tipor</option>
+                        <option value="Stock">En Stock</option>
+                        <option value="Precio">Precio</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input class="form-control"@bind="ValorFiltro"placeholder="Buscar Producto..." />
+                        <button type="button"class="btn btn-outline-primary"@onclick="Buscar"><span class="bi bi-search"></span>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+
+                @*FiltroFecha*@
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <label class="col-form-label"><strong>Desde</strong></label>
+                        <InputDate class="form-control" @bind-Value="Desde"></InputDate>
+                    </div>
+
+                    <div class="col-3">
+                        <label class="col-form-label"><strong>Hasta</strong></label>
+                        <div class="input-group">
+                            <InputDate class="form-control" @bind-Value="Hasta"></InputDate>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid mt-3">
+                <QuickGrid Items="@itemsQueryable">
+                    <PropertyColumn Property="@(l => l.ProductoId)" Title="Id Producto"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.NombreProducto)" Title="Nombre del producto"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.Tipo)" Title="Tipo"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.Stock)" Title="Año de publicación"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.Precio)" Title="Disponibilidad" Sortable="true" />
+                    <PropertyColumn Property="@(p => p.Estado)" Title="Estado" Sortable="true" />
+                </QuickGrid>
+            </div>
+        </div>
+
+        @*footer*@
+        <div class="card-footer d-flex justify-content-between align-items-center mb-4">
+            <label>Cantidad Productos: @productos.Count</label>
+            <Label>Total en Stock: @productos.Count</Label>
+        </div>
+
+    </div>
+</div>
+```
+
+
+@code {
+
+    private List<Productos> productos = new ();
+    IQueryable<Productos>? itemsQueryable;
+
+    private string Filtro { get; set; } = string.Empty;
+    private string ValorFiltro { get; set; } = string.Empty;
+
+    public DateOnly? Desde { get; set; }
+    public DateOnly? Hasta { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProductoServices.GetList(l => true);
+        result.OnSuccess(p => productos = p);
+
+        itemsQueryable = productos.AsQueryable();
+    }
+
+    private async Task Buscar()
+    {
+        if (Filtro == "NombreProducto" && Desde.HasValue && Hasta.HasValue)
+        {
+            productos = await ProductoServices
+                .Listar(f => f.Fecha >= Desde.Value && f.Fecha <= Hasta.Value);
+        }
+        else if (Filtro == "Tipo" && !string.IsNullOrWhiteSpace(ValorFiltro))
+        {
+            productos = await ProductoServices
+                .Listar(p => p.Tipo != null && p.Tipo.ToLower().Contains(ValorFiltro.ToLower()));
+        }
+        else if(Filtro == "Precio")
+        {
+            productos = await ProductoServices.Listar(p => p.Precio > 0 && p.Precio.ToString().Contains(ValorFiltro.ToLower()));
+        }
+
+        itemsQueryable = productos.AsQueryable();
+    }
+}
