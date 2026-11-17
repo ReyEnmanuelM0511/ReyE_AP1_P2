@@ -22,5 +22,9 @@ public class Productos
 
     [Required(ErrorMessage = "Este campo es obligatorio")]
     public bool Estado { get; set; } = true;
+
+
+    [Required(ErrorMessage = "Este campo es obligatorio")]
+    public DateOnly Fecha { get; set; } 
 }
 
