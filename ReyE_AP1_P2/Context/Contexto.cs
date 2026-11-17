@@ -7,8 +7,8 @@ public class Contexto : DbContext
 {
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
-    DbSet<Productos> Producto { get; set; }
-    DbSet<Ventas> Venta { get; set; }
-    DbSet<VentasDetalle> VentaDetalle { get; set; }
+    public DbSet<Productos> Producto { get; set; }
+    public DbSet<Ventas> Venta { get; set; }
+    public DbSet<VentasDetalle> VentaDetalle { get; set; }
 }
 
