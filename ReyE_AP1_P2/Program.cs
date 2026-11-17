@@ -1,6 +1,8 @@
 using ReyE_AP1_P2.Components;
 using ReyE_AP1_P2.Context;
 using Microsoft.EntityFrameworkCore;
+using ReyE_AP1_P2.Models;
+using ReyE_AP1_P2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +13,11 @@ builder.Services.AddRazorComponents()
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlite(ConStr));
+builder.Services.AddScoped<VentasDetalle>();
+builder.Services.AddScoped<VentasServices>();
+builder.Services.AddScoped<ProductosServices>();
 
-
+builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 
@@ -25,6 +30,8 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+
+app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
