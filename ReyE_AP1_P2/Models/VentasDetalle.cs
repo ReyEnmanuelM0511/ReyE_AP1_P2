@@ -20,6 +20,9 @@ public class VentasDetalle
     [Range(1, int.MaxValue, ErrorMessage = "Ingrese una cantidad valida")]
     public int Cantidad { get; set; }
 
+    [Required(ErrorMessage = "Este campo es obligatorio")]
+    public string Descripcion { get; set; } = null!;
+
     [ForeignKey("ProductoId")]
     public virtual Productos Producto { get; set; } = null!;
 
