@@ -118,6 +118,12 @@ public class VentasServices(IDbContextFactory<Contexto> contextFactory) : IServi
             .ToListAsync();
     }
 
+    public async Task<List<Ventas>> Listar(Expression<Func<Ventas, bool>> criterio)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Venta.Include(v => v.VentaDetalle).ThenInclude(v => v.Producto).Where(criterio).AsNoTracking().ToListAsync();
+    }   
+
     public enum Operacion
     {
         Suma = 1,
